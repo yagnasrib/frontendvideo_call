@@ -3,18 +3,22 @@ import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import humanId from "human-id";
 import axios from "axios";
 import "./App.css";
+const API_BASE_URL = "https://video-conf-backend-1.onrender.com"; // Use Render backend URL
+
 
 function App() {
   const [kitToken, setKitToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Generate or retrieve room ID from URL
-  let roomID = window.location.pathname.substring(1);
+  let roomID = window.location.pathname.substring(1); // Get the room ID from the URL path
 
-  if (!roomID) {
-    roomID = humanId({ separator: "_", capitalize: false });
-    window.history.pushState({}, "", "/" + roomID);
-  }
+// If roomID is not in the URL, generate a new one
+if (!roomID) {
+  roomID = humanId({ separator: "_", capitalize: false });
+  window.history.pushState({}, "", `/${roomID}`); // Update the URL with the new room ID
+}
+
 
   const roomRef = useRef(null); // Reference to the video container
 
@@ -28,7 +32,7 @@ function App() {
           userName: humanId({ adjectiveCount: 0 }),
         });
 
-        const response = await axios.post("http://localhost:5001/api/meetings/generate-token", {
+        const response = await axios.post("https://video-conf-backend-1.onrender.com/api/meetings/generate-token", {
           roomID,
           userID: humanId(),
           userName: humanId({ adjectiveCount: 0 }),
