@@ -1,0 +1,158 @@
+.room-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #202124;
+    color: #fff;
+  }
+  
+  .room-header {
+    padding: 1rem;
+    background-color: #3c4043;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .video-container {
+    flex: 1;
+    position: relative;
+    background-color: #202124;
+  }
+  
+  .host-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 100;
+    background-color: rgba(32, 33, 36, 0.9);
+    padding: 1rem;
+    border-radius: 8px;
+    max-width: 300px;
+  }
+  
+  .waiting-participants {
+    margin-top: 1rem;
+  }
+  
+  .waiting-participant {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #3c4043;
+  }
+  
+  .participant-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .control-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #3c4043;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .control-btn:hover {
+    background-color: #4a4d51;
+  }
+  
+  .control-btn.active {
+    background-color: #ea4335;
+  }
+  
+  .admit-btn {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .deny-btn {
+    background-color: #ea4335;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .meeting-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background-color: rgba(32, 33, 36, 0.9);
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .control-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .leave-btn {
+    background-color: #ea4335;
+  }
+  
+  .leave-btn:hover {
+    background-color: #d33426;
+  }
+  
+  .waiting-room {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #202124;
+    color: #fff;
+  }
+  
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #202124;
+    color: #fff;
+  }
+  
+  .meeting-info {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .participant-count,
+  .sharing-indicator,
+  .hand-raised-indicator {
+    background-color: rgba(60, 64, 67, 0.9);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  
+  .sharing-indicator {
+    color: #1a73e8;
+  }
+  
+  .hand-raised-indicator {
+    color: #fbbc04;
+  }
+  
+  
