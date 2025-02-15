@@ -9,6 +9,11 @@ import "./Room.css"
 
 export default function Room() {
   const { roomId } = useParams()
+  const userName = localStorage.getItem("userName") || "Guest User";
+const userEmail = localStorage.getItem("userEmail") || "";
+console.log("User Name:", userName); // Debugging: Check if it's correct
+console.log("User Email:", userEmail);
+
   const location = useLocation()
   const navigate = useNavigate()
   const zpRef = useRef(null)
@@ -20,6 +25,7 @@ export default function Room() {
   const [waitingParticipants, setWaitingParticipants] = useState([])
   const [isWaiting, setIsWaiting] = useState(false)
   const [isAdmitted, setIsAdmitted] = useState(false)
+  const [googleUser, setGoogleUser] = useState(null) // Store google user info
 
   const initializeAudioContext = useCallback(() => {
     if (!audioContextInitialized.current) {
@@ -45,7 +51,7 @@ export default function Room() {
           SECRET,
           roomId,
           Date.now().toString(),
-          "Your Name",
+          userName 
         )
 
         const zp = ZegoUIKitPrebuilt.create(kitToken)
@@ -85,7 +91,7 @@ export default function Room() {
         navigate("/")
       }
     },
-    [roomId, isHost, navigate, initializeAudioContext],
+    [roomId, isHost, googleUser, navigate, initializeAudioContext]
   )
 
   const handleAdmitParticipant = async (participant) => {
@@ -97,7 +103,6 @@ export default function Room() {
           participantId: participant.userID,
         })
         setWaitingParticipants((prev) => prev.filter((p) => p.userID !== participant.userID))
-        // Notify the admitted participant
         zpRef.current.sendCustomCommand(participant.userID, "admit")
       }
     } catch (error) {
@@ -113,10 +118,18 @@ export default function Room() {
   }
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search)
-    setCallType(query.get("type"))
-    setIsHost(query.get("host") === "true")
-  }, [location.search])
+    const query = new URLSearchParams(location.search);
+    setCallType(query.get("type"));
+    setIsHost(query.get("host") === "true");
+  
+    const name = query.get("userName");
+    const email = query.get("userEmail");
+  
+    if (name && email) {
+      setGoogleUser({ name, email });
+    }
+  }, [location.search]);
+  
 
   useEffect(() => {
     if (callType) {
@@ -139,7 +152,6 @@ export default function Room() {
       })
     }
   }, [isHost])
-  
 
   if (isWaiting && !isHost && !isAdmitted) {
     return (
