@@ -4,18 +4,17 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { v4 as uuidv4 } from "uuid"
-import { GoogleLogin } from "@react-oauth/google"
+import { GoogleLogin, googleLogout, useGoogleLogin } from "@react-oauth/google"
 import "./CreateRoom.css"
 
 function CreateRoom() {
-    
   const [roomId, setRoomId] = useState("")
   const [callType, setCallType] = useState("group")
   const [isHost, setIsHost] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  
-  const [googleUser, setGoogleUser] = useState(null) // Store Google user info
+  const [googleUser, setGoogleUser] = useState(null)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
   const navigate = useNavigate()
 
   const generateRoomId = () => {
@@ -26,8 +25,6 @@ function CreateRoom() {
   const handleGoogleLoginSuccess = async (response) => {
     try {
       const token = response.credential
-
-      // Send token to backend for verification
       const res = await axios.post("http://localhost:5001/api/auth/google-login", { token })
       setGoogleUser(res.data)
       console.log("Google User:", res.data)
@@ -37,35 +34,42 @@ function CreateRoom() {
     }
   }
 
+  const handleLogout = () => {
+    googleLogout()
+    setGoogleUser(null)
+    setShowProfileMenu(false)
+  }
+
+  const addAnotherAccount = useGoogleLogin({
+    onSuccess: handleGoogleLoginSuccess,
+    onError: () => setError("Failed to add another account."),
+  })
+
   const handleCreateRoom = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
     try {
-        const finalRoomId = roomId || uuidv4().substring(0, 8);
+      const finalRoomId = roomId || uuidv4().substring(0, 8)
 
-        await axios.post("http://localhost:5001/api/rooms/create", {
-            roomId: finalRoomId,
-            callType,
-            hostId: isHost ? googleUser?.email || "user-" + Date.now() : "",
-        });
+      await axios.post("http://localhost:5001/api/rooms/create", {
+        roomId: finalRoomId,
+        callType,
+        hostId: isHost ? googleUser?.email || "user-" + Date.now() : "",
+      })
 
-        // ✅ Store user details in localStorage instead of passing in URL
-        localStorage.setItem("userName", googleUser?.name || "Guest User");
-        localStorage.setItem("userEmail", googleUser?.email || "");
+      localStorage.setItem("userName", googleUser?.name || "Guest User")
+      localStorage.setItem("userEmail", googleUser?.email || "")
 
-        // ✅ Redirect without exposing user details in the URL
-        navigate(`/room/${finalRoomId}?type=${callType}&host=${isHost}`);
-
+      navigate(`/room/${finalRoomId}?type=${callType}&host=${isHost}`)
     } catch (error) {
-        setError("Failed to create room. Please try again.");
-        console.error("Error creating room:", error);
+      setError("Failed to create room. Please try again.")
+      console.error("Error creating room:", error)
     } finally {
-        setLoading(false);
+      setLoading(false)
     }
-};
-
+  }
 
   const handleJoinRoom = async (e) => {
     e.preventDefault()
@@ -83,7 +87,9 @@ function CreateRoom() {
         roomId,
         participantId: googleUser?.email || "user-" + Date.now(),
       })
-      navigate(`/room/${roomId}?type=${callType}`)
+      localStorage.setItem("userName", googleUser?.name || "Guest User")
+      localStorage.setItem("userEmail", googleUser?.email || "")
+      navigate(`/room/${roomId}?type=${callType}&host=false`)
     } catch (error) {
       setError("Failed to join room. Please try again.")
       console.error("Error joining room:", error)
@@ -94,16 +100,29 @@ function CreateRoom() {
 
   return (
     <div className="create-room-container">
-      <h1>Video Conference</h1>
-
-      {/* Google Login Display */}
-      <p>Logged in as: {googleUser ? googleUser.name : "Not logged in"}</p>
-      {!googleUser && (
-        <GoogleLogin
-          onSuccess={handleGoogleLoginSuccess}
-          onError={() => setError("Failed to sign in with Google.")}
-        />
-      )}
+      <div className="header">
+        <h1>Video Conference</h1>
+        {googleUser ? (
+          <div className="profile-section">
+            <img
+              src={googleUser.picture}
+              alt="Profile"
+              className="profile-image"
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+            />
+            {showProfileMenu && (
+              <div className="profile-dropdown">
+                <p>{googleUser.name}</p>
+                <p>{googleUser.email}</p>
+                <button onClick={addAnotherAccount} className="add-account-btn">+ Add Another Account</button>
+                <button onClick={handleLogout} className="logout-btn">Sign Out</button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <GoogleLogin onSuccess={handleGoogleLoginSuccess} onError={() => setError("Failed to sign in with Google.")} />
+        )}
+      </div>
 
       {error && <div className="error-message">{error}</div>}
 

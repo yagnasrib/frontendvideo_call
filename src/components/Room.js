@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useRef, useState, useEffect, useCallback } from "react"
@@ -9,11 +10,8 @@ import "./Room.css"
 
 export default function Room() {
   const { roomId } = useParams()
-  const userName = localStorage.getItem("userName") || "Guest User";
-const userEmail = localStorage.getItem("userEmail") || "";
-console.log("User Name:", userName); // Debugging: Check if it's correct
-console.log("User Email:", userEmail);
-
+  const userName = localStorage.getItem("userName") || "Guest User"
+  const userEmail = localStorage.getItem("userEmail") || ""
   const location = useLocation()
   const navigate = useNavigate()
   const zpRef = useRef(null)
@@ -25,7 +23,6 @@ console.log("User Email:", userEmail);
   const [waitingParticipants, setWaitingParticipants] = useState([])
   const [isWaiting, setIsWaiting] = useState(false)
   const [isAdmitted, setIsAdmitted] = useState(false)
-  const [googleUser, setGoogleUser] = useState(null) // Store google user info
 
   const initializeAudioContext = useCallback(() => {
     if (!audioContextInitialized.current) {
@@ -51,7 +48,7 @@ console.log("User Email:", userEmail);
           SECRET,
           roomId,
           Date.now().toString(),
-          userName 
+          userName,
         )
 
         const zp = ZegoUIKitPrebuilt.create(kitToken)
@@ -91,7 +88,7 @@ console.log("User Email:", userEmail);
         navigate("/")
       }
     },
-    [roomId, isHost, googleUser, navigate, initializeAudioContext]
+    [roomId, isHost, userName, navigate, initializeAudioContext],
   )
 
   const handleAdmitParticipant = async (participant) => {
@@ -103,7 +100,7 @@ console.log("User Email:", userEmail);
           participantId: participant.userID,
         })
         setWaitingParticipants((prev) => prev.filter((p) => p.userID !== participant.userID))
-        zpRef.current.sendCustomCommand(participant.userID, "admit")
+        zpRef.current.sendCustomCommand([participant.userID], "admit")
       }
     } catch (error) {
       console.error("Failed to admit participant:", error)
@@ -111,25 +108,15 @@ console.log("User Email:", userEmail);
   }
 
   const handleMuteAll = () => {
-    if (!isHost) return
-    if (zpRef.current) {
-      zpRef.current.muteAllUsers?.()
-    }
+    if (!isHost || !zpRef.current) return
+    zpRef.current.muteAllParticipants()
   }
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    setCallType(query.get("type"));
-    setIsHost(query.get("host") === "true");
-  
-    const name = query.get("userName");
-    const email = query.get("userEmail");
-  
-    if (name && email) {
-      setGoogleUser({ name, email });
-    }
-  }, [location.search]);
-  
+    const query = new URLSearchParams(location.search)
+    setCallType(query.get("type"))
+    setIsHost(query.get("host") === "true")
+  }, [location.search])
 
   useEffect(() => {
     if (callType) {
@@ -191,3 +178,5 @@ console.log("User Email:", userEmail);
     </div>
   )
 }
+
+
