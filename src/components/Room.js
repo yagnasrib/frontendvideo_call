@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useRef, useState, useEffect, useCallback } from "react"
@@ -38,7 +37,8 @@ export default function Room() {
   const myMeeting = useCallback(
     async (type) => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/rooms/${roomId}`)
+        const apiUrl = process.env.REACT_APP_API_URL
+        const response = await axios.get(`${apiUrl}/api/rooms/${roomId}`)
         const roomData = response.data
 
         initializeAudioContext()
@@ -94,8 +94,9 @@ export default function Room() {
   const handleAdmitParticipant = async (participant) => {
     if (!isHost) return
     try {
+      const apiUrl = process.env.REACT_APP_API_URL
       if (zpRef.current) {
-        await axios.post(`http://localhost:5001/api/rooms/join`, {
+        await axios.post(`${apiUrl}/api/rooms/join`, {
           roomId,
           participantId: participant.userID,
         })
@@ -178,5 +179,3 @@ export default function Room() {
     </div>
   )
 }
-
-

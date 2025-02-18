@@ -17,6 +17,8 @@ function CreateRoom() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const navigate = useNavigate()
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001"
+
   const generateRoomId = () => {
     const newRoomId = uuidv4().substring(0, 8)
     setRoomId(newRoomId)
@@ -25,7 +27,7 @@ function CreateRoom() {
   const handleGoogleLoginSuccess = async (response) => {
     try {
       const token = response.credential
-      const res = await axios.post("http://localhost:5001/api/auth/google-login", { token })
+      const res = await axios.post(`${apiUrl}/api/auth/google-login`, { token })
       setGoogleUser(res.data)
       console.log("Google User:", res.data)
     } catch (error) {
@@ -53,7 +55,7 @@ function CreateRoom() {
     try {
       const finalRoomId = roomId || uuidv4().substring(0, 8)
 
-      await axios.post("http://localhost:5001/api/rooms/create", {
+      await axios.post(`${apiUrl}/api/rooms/create`, {
         roomId: finalRoomId,
         callType,
         hostId: isHost ? googleUser?.email || "user-" + Date.now() : "",
@@ -83,7 +85,7 @@ function CreateRoom() {
     }
 
     try {
-      await axios.post("http://localhost:5001/api/rooms/join", {
+      await axios.post(`${apiUrl}/api/rooms/join`, {
         roomId,
         participantId: googleUser?.email || "user-" + Date.now(),
       })

@@ -8,7 +8,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     {/* Wrap your application in GoogleOAuthProvider to provide Google OAuth context */}
-    <GoogleOAuthProvider clientId="524054778480-4961o9coggh05c3lo1u7gltq189tcm6m.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="1015560032092-mqnets80kbhbf9pmvs72ksn31ofguple.apps.googleusercontent.com">
       <App />
     </GoogleOAuthProvider>
   </React.StrictMode>
